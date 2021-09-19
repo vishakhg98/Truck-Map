@@ -179,6 +179,7 @@ function App() {
 					idle: dataStore.idle.length,
 					error: dataStore.error.length
 				}}
+				data={filteredData[selectedMode]}
 			/>
 
 			<div className="container">
