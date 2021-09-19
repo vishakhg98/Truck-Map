@@ -4,27 +4,21 @@
 }
 
 .sidebarRows {
-	overflow-y: auto;
+	overflow: auto;
 	/* Search (height35 + paddingTopBottom0 + border-bottom2) */
-	/* height: calc(100% - 57px); */
 	height: calc(100% - 36px);
 }
 .sidebarRows::-webkit-scrollbar {
 	width: 6px;
 	height: 6px;
 }
-
 .sidebarRows::-webkit-scrollbar-track {
 	box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-	/* visibility: hidden; */
 }
-/* .sidebarRows::-webkit-scrollbar-track:hover {
-	visibility: visible;
-} */
+
 .sidebarRows::-webkit-scrollbar-thumb {
 	background-color: var(--input-light);
 	border-radius: 30px;
-	/* visibility: hidden; */
 }
 
 .sidebarRow,

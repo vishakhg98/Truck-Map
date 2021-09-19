@@ -13,6 +13,13 @@ export default function SelectBox(props) {
 		setSelectedData(tempData);
 	}
 
+	function removeFromSelected(data) {
+		let tempData = selectedData.filter(truck => {
+			return truck.truckNumber !== data.truckNumber;
+		});
+		setSelectedData(tempData);
+	}
+
 	let filteredData = props.data;
 	if (searchValue) {
 		filteredData = props.data.filter(i =>
@@ -31,8 +38,13 @@ export default function SelectBox(props) {
 			</div>
 			<div className="selectBoxContentContainer">
 				<ul className="selectBox-selectedContainer">
-					{selectedData.map(i => (
-						<li className="selectBox-selectedItem">{i.truckNumber}</li>
+					{selectedData.map(truck => (
+						<li
+							className="selectBox-selectedItem"
+							onClick={() => removeFromSelected(truck)}
+						>
+							{truck.truckNumber}
+						</li>
 					))}
 				</ul>
 				<Search updateSearch={value => setSearchValue(value)} />
