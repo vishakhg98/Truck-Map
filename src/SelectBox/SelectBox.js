@@ -4,7 +4,7 @@ import './Css/SelectBox.css';
 
 export default function SelectBox(props) {
 	return (
-		<div className="selectBoxBase" tabindex="0">
+		<div className="selectBoxBase" tabIndex="0">
 			<div className="selectBox-head">
 				Select <span className="selectBox-arrow">⮟</span>
 			</div>

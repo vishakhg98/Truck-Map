@@ -5,20 +5,6 @@ import './Css/Map.css';
 let map;
 let markers = [];
 
-function initMap() {
-	console.log('INIT MAP');
-
-	// Center india location
-	const centerLocation = { lat: 22.3, lng: 78.87 };
-
-	map = new window.google.maps.Map(document.getElementById('map'), {
-		zoom: 5,
-		center: centerLocation,
-		// mapTypeId: 'hybrid',
-		disableDefaultUI: false
-	});
-}
-
 // Adds a marker to the map and push to the array.
 export function addMarker(position, title, markerColor) {
 	let image;
@@ -67,13 +53,12 @@ function animateMapZoomTo(map, targetZoom = 15) {
 		);
 		setTimeout(function () {
 			map.setZoom(currentZoom);
-		}, 80);
+		}, 100);
 	}
 }
 
-export default function Map() {
+export default function Map(props) {
 	useEffect(() => {
-		console.log('MAP LOADING');
 		// Loading Map
 		try {
 			const script = document.createElement('script');
@@ -81,14 +66,34 @@ export default function Map() {
 			script.async = true;
 			script.defer = true;
 			script.type = 'text/javascript';
-			script.onload = () => {
-				initMap();
+			script.onload = async () => {
+				await initMap();
 			};
 			document.body.appendChild(script);
+			console.log('MAP LOADED');
 		} catch (err) {
 			console.error(err);
 		}
+
+		// eslint-disable-next-line
 	}, []);
+
+	async function initMap() {
+		// Center india location
+		const centerLocation = { lat: 22.3, lng: 78.87 };
+
+		map = await new window.google.maps.Map(document.getElementById('map'), {
+			zoom: 5,
+			center: centerLocation,
+			mapTypeId: 'hybrid',
+			disableDefaultUI: false
+		});
+
+		console.log('MAP INITIALIZED');
+
+		// Fetching API data
+		if (props.onLoadAction) await props.onLoadAction();
+	}
 
 	return (
 		<div

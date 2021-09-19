@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './App.css';
+import Map, { addMarker, deleteMarkers, setMapCenterAndZoom } from './Map/Map';
 import { API_URL, fourHoursInMs, TRUCK_KEYS } from './utils/Constants';
 import Header from './Header/Header';
 import Sidebar from './Sidebar/Sidebar';
-import Map, { addMarker, deleteMarkers, setMapCenterAndZoom } from './Map/Map';
 
 function App() {
 	const [dataStore, setDataStore] = useState({
@@ -13,54 +13,11 @@ function App() {
 		idle: [],
 		error: []
 	});
-	const [filteredData, setFilteredData] = useState({
-		total: [],
-		running: [],
-		stopped: [],
-		idle: [],
-		error: []
-	});
 	const [selectedMode, setSelectedMode] = useState(TRUCK_KEYS.total);
 	const [sidebarData, setSidebarData] = useState([]);
 
-	useEffect(() => {
-		// Fetching API Data
-		getInitialData();
-	}, []);
-
-	function handleData(key) {
-		// Updating selected mode
-		setSelectedMode(key);
-
-		// Updating sidebar
-		setSidebarData(dataStore[key]);
-
-		// Updating Map
-		deleteMarkers();
-
-		// If no value exist exit
-		if (!dataStore[key].length) return false;
-
-		dataStore[key].forEach(truck => {
-			const newMarker = {
-				lat: truck.lat,
-				lng: truck.lng
-			};
-
-			let markerColor;
-			if (truck.status === TRUCK_KEYS.running) markerColor = 'green';
-			if (truck.status === TRUCK_KEYS.stopped) markerColor = 'blue';
-			if (truck.status === TRUCK_KEYS.idle) markerColor = 'yellow';
-			if (truck.status === TRUCK_KEYS.error) markerColor = 'red';
-
-			addMarker(newMarker, truck.truckNumber, markerColor);
-		});
-
-		// Setting center to first truck and zooming
-		setMapCenterAndZoom(dataStore[key][0].lat, dataStore[key][0].lng, 10);
-	}
-
-	async function getInitialData() {
+	async function getApiData() {
+		console.log('HITTING API');
 		// Hitting API
 		try {
 			const headers = {
@@ -122,23 +79,7 @@ function App() {
 				});
 
 				// Add markers to map
-				totalTemp.forEach(truck => {
-					const newMarker = {
-						lat: truck.lat,
-						lng: truck.lng
-					};
-
-					let markerColor;
-					if (truck.status === TRUCK_KEYS.running) markerColor = 'green';
-					if (truck.status === TRUCK_KEYS.stopped) markerColor = 'blue';
-					if (truck.status === TRUCK_KEYS.idle) markerColor = 'yellow';
-					if (truck.status === TRUCK_KEYS.error) markerColor = 'red';
-
-					addMarker(newMarker, truck.truckNumber, markerColor);
-				});
-
-				// Setting center to first truck and zooming
-				setMapCenterAndZoom(totalTemp[0].lat, totalTemp[0].lng, 10);
+				addNewMarkersToMap(totalTemp);
 
 				// Storing data
 				setDataStore({
@@ -148,17 +89,6 @@ function App() {
 					idle: idleTemp,
 					error: errorTemp
 				});
-
-				setFilteredData({
-					total: totalTemp,
-					running: runningTemp,
-					stopped: stoppedTemp,
-					idle: idleTemp,
-					error: errorTemp
-				});
-
-				// Setting total as sidebar default
-				setSidebarData(totalTemp);
 			} else {
 				throw new Error(response.statusText);
 			}
@@ -167,11 +97,43 @@ function App() {
 		}
 	}
 
+	async function addNewMarkersToMap(data) {
+		// Updating sidebar
+		setSidebarData(data);
+
+		// Updating Map
+		deleteMarkers();
+
+		// If no value exist exit
+		if (!data.length) return false;
+
+		await data.forEach(truck => {
+			const newMarker = {
+				lat: truck.lat,
+				lng: truck.lng
+			};
+
+			let markerColor;
+			if (truck.status === TRUCK_KEYS.running) markerColor = 'green';
+			if (truck.status === TRUCK_KEYS.stopped) markerColor = 'blue';
+			if (truck.status === TRUCK_KEYS.idle) markerColor = 'yellow';
+			if (truck.status === TRUCK_KEYS.error) markerColor = 'red';
+
+			addMarker(newMarker, truck.truckNumber, markerColor);
+		});
+
+		// Setting center to first truck and zooming
+		setMapCenterAndZoom(data[0].lat, data[0].lng, 12);
+	}
+
 	return (
 		<div className="App">
 			<Header
 				selectedMode={selectedMode}
-				updateSelectedMode={key => handleData(key)}
+				updateSelectedMode={key => {
+					setSelectedMode(key);
+					addNewMarkersToMap(dataStore[key]);
+				}}
 				counts={{
 					total: dataStore.total.length,
 					running: dataStore.running.length,
@@ -179,13 +141,12 @@ function App() {
 					idle: dataStore.idle.length,
 					error: dataStore.error.length
 				}}
-				data={filteredData[selectedMode]}
 			/>
 
 			<div className="container">
 				<Sidebar data={sidebarData} />
 
-				<Map />
+				<Map onLoadAction={() => getApiData()} />
 			</div>
 		</div>
 	);
