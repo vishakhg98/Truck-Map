@@ -1,134 +1,191 @@
+import { useEffect, useState } from 'react';
 import './App.css';
-import {
-	API_URL,
-	BLUE_MARKER,
-	// GOOGLE_MAP_KEY,
-	GREEN_MARKER
-	// TEMP_DATA
-} from './utils/Constants';
-import { useEffect } from 'react';
-
-let map;
-
-const PLACES = [
-	{
-		lat: 30.757919311523438,
-		lng: 76.13247680664062,
-		color: BLUE_MARKER,
-		title: 'YO TRUCK 1'
-	},
-	{
-		lat: 30.757919311523438,
-		lng: 76.132,
-		color: GREEN_MARKER,
-		title: 'YO TRUCK 2'
-	}
-];
-function initMap() {
-	map = new window.google.maps.Map(document.getElementById('map'), {
-		center: { lat: 30.757919311523438, lng: 76.13247680664062 },
-		zoom: 16
-	});
-
-	// new window.google.maps.Marker({
-	// 	position: { lat: 30.757919311523438, lng: 76.13247680664062 },
-	// 	map,
-	// 	title: 'Hello World!'
-	// });
-
-	PLACES.forEach(place => {
-		const image = `http://maps.google.com/mapfiles/ms/icons/${place.color}-dot.png`;
-		new window.google.maps.Marker({
-			position: { lat: place.lat, lng: place.lng },
-			map,
-			icon: image,
-			title: place.title
-		});
-	});
-	// const image =
-	// 	'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
-	// const beachMarker = new window.google.maps.Marker({
-	// 	position: { lat: 30.757919311523438, lng: 76.132 },
-	// 	map,
-	// 	icon: image
-	// });
-}
+import { API_URL, fourHoursInMs, TRUCK_KEYS } from './utils/Constants';
+import Header from './Header/Header';
+import Sidebar from './Sidebar/Sidebar';
+import Map, { addMarker, deleteMarkers, setMapCenterAndZoom } from './Map/Map';
 
 function App() {
-	// const [dataStore, setDataStore] = useState([...TEMP_DATA]);
-	// const [mapData, setMapData] = useState([]);
+	const [dataStore, setDataStore] = useState({
+		total: [],
+		running: [],
+		stopped: [],
+		idle: [],
+		error: []
+	});
+	const [filteredData, setFilteredData] = useState({
+		total: [],
+		running: [],
+		stopped: [],
+		idle: [],
+		error: []
+	});
+	const [selectedMode, setSelectedMode] = useState(TRUCK_KEYS.total);
+	const [sidebarData, setSidebarData] = useState([]);
+
 	useEffect(() => {
-		// Initialising map
-		try {
-			const script = document.createElement('script');
-			script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBECBmDGXDR_37hLJU-zjMSZ65OIA4Ikek`;
-
-			// script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAP_KEY}`;
-
-			script.async = true;
-			script.type = 'text/javascript';
-
-			script.onload = () => {
-				initMap();
-			};
-			document.body.appendChild(script);
-		} catch (err) {
-			console.error(err);
-		}
+		// Fetching API Data
 		getInitialData();
 	}, []);
 
-	async function getInitialData() {
-		console.log(API_URL);
-		// initMap();
-		// try {
-		// 	const headers = {
-		// 		'Content-Type': 'application/json'
-		// 	};
-		// 	const response = await fetch(API_URL, {
-		// 		method: 'GET',
-		// 		headers
-		// 	});
-		// 	console.log(response);
-		// 	const responseJson = await response.json();
-		// 	console.log(responseJson);
-		// 	if (responseJson.responseCode.responseCode === 200) {
-		// 		// Task here
-		// 		console.log(responseJson.data);
-		// 		setDataStore(responseJson.data);
-		// 	} else {
-		// 		throw new Error(responseJson.responseCode.message);
-		// 	}
-		// } catch (err) {
-		// 	console.error(err);
-		// }
+	function handleData(key) {
+		// Updating selected mode
+		setSelectedMode(key);
+
+		// Updating sidebar
+		setSidebarData(dataStore[key]);
+
+		// Updating Map
+		deleteMarkers();
+
+		// If no value exist exit
+		if (!dataStore[key].length) return false;
+
+		dataStore[key].forEach(truck => {
+			const newMarker = {
+				lat: truck.lat,
+				lng: truck.lng
+			};
+
+			let markerColor;
+			if (truck.status === TRUCK_KEYS.running) markerColor = 'green';
+			if (truck.status === TRUCK_KEYS.stopped) markerColor = 'blue';
+			if (truck.status === TRUCK_KEYS.idle) markerColor = 'yellow';
+			if (truck.status === TRUCK_KEYS.error) markerColor = 'red';
+
+			addMarker(newMarker, truck.truckNumber, markerColor);
+		});
+
+		// Setting center to first truck and zooming
+		setMapCenterAndZoom(dataStore[key][0].lat, dataStore[key][0].lng, 10);
 	}
 
-	// console.log(dataStore.length);
+	async function getInitialData() {
+		// Hitting API
+		try {
+			const headers = {
+				'Content-Type': 'application/json'
+			};
+			const response = await fetch(API_URL, {
+				method: 'GET',
+				headers
+			});
+
+			if (response.ok) {
+				const responseJson = await response.json();
+				console.log(responseJson);
+
+				let totalTemp = [];
+				let runningTemp = [];
+				let stoppedTemp = [];
+				let idleTemp = [];
+				let errorTemp = [];
+
+				const currentDateTimeMs = Date.now();
+
+				await responseJson.data.forEach(truck => {
+					const currentTruck = {
+						truckNumber: truck.truckNumber,
+						lat: truck.lastWaypoint.lat,
+						lng: truck.lastWaypoint.lng,
+						createTime: truck.lastWaypoint.createTime,
+						speed: truck.lastWaypoint.speed,
+						ignitionOn: truck.lastWaypoint.ignitionOn,
+						stopStartTime: truck.lastRunningState.stopStartTime,
+						truckRunningState: truck.lastRunningState.truckRunningState
+					};
+
+					if (currentDateTimeMs - currentTruck.createTime >= fourHoursInMs) {
+						// Running Trucks -Trucks which haven’t responded from the last 4 hours
+						currentTruck.status = 'error';
+						errorTemp.push(currentTruck);
+					} else {
+						if (currentTruck.truckRunningState) {
+							// Running Trucks - Trucks in moving state
+							currentTruck.status = 'running';
+							runningTemp.push(currentTruck);
+						} else {
+							// Idle Trucks - Stopped but ignition is on
+							if (currentTruck.ignitionOn) {
+								currentTruck.status = 'idle';
+								idleTemp.push(currentTruck);
+							}
+							// Stopped Trucks - stopped at the moment and ignition is off
+							else {
+								currentTruck.status = 'stopped';
+								stoppedTemp.push(currentTruck);
+							}
+						}
+					}
+
+					totalTemp.push(currentTruck);
+				});
+
+				// Add markers to map
+				totalTemp.forEach(truck => {
+					const newMarker = {
+						lat: truck.lat,
+						lng: truck.lng
+					};
+
+					let markerColor;
+					if (truck.status === TRUCK_KEYS.running) markerColor = 'green';
+					if (truck.status === TRUCK_KEYS.stopped) markerColor = 'blue';
+					if (truck.status === TRUCK_KEYS.idle) markerColor = 'yellow';
+					if (truck.status === TRUCK_KEYS.error) markerColor = 'red';
+
+					addMarker(newMarker, truck.truckNumber, markerColor);
+				});
+
+				// Setting center to first truck and zooming
+				setMapCenterAndZoom(totalTemp[0].lat, totalTemp[0].lng, 10);
+
+				// Storing data
+				setDataStore({
+					total: totalTemp,
+					running: runningTemp,
+					stopped: stoppedTemp,
+					idle: idleTemp,
+					error: errorTemp
+				});
+
+				setFilteredData({
+					total: totalTemp,
+					running: runningTemp,
+					stopped: stoppedTemp,
+					idle: idleTemp,
+					error: errorTemp
+				});
+
+				// Setting total as sidebar default
+				setSidebarData(totalTemp);
+			} else {
+				throw new Error(response.statusText);
+			}
+		} catch (err) {
+			console.error(err);
+		}
+	}
+
 	return (
 		<div className="App">
-			HOME
-			<div id="map" style={{ height: 500, width: '100%' }} />
-			{/* <iframe
-				// width="600"
-				// height="450"
-				// style="border:0"
-				// loading="lazy"
-				allowfullscreen
-				src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyCb9hLTy-qktNnGvGbwAIt21aT0TW293i8&q=Space+Needle,Seattle+WA`}
-			></iframe> */}
-			{/* <iframe
-				src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBECBmDGXDR_37hLJU-zjMSZ65OIA4Ikek&q=Theophiledonnéstraat+79+3540+Donk`}
-				allowfullscreen
-			></iframe> */}
-			{/* <iframe
-				src={`http://maps.google.com/maps?q=30.757919311523438,76.13247680664062&30.755468368530273,76.13896179199219&z=15&output=embed`}
-			></iframe> */}
-			{/* <iframe
-				width={'100%'}
-				zoom={16}
-				src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBECBmDGXDR_37hLJU-zjMSZ65OIA4Ikek&q=30.757919311523438,76.13247680664062&q=30.757966,76.132201`}
-			></iframe> */}
+			<Header
+				selectedMode={selectedMode}
+				updateSelectedMode={key => handleData(key)}
+				counts={{
+					total: dataStore.total.length,
+					running: dataStore.running.length,
+					stopped: dataStore.stopped.length,
+					idle: dataStore.idle.length,
+					error: dataStore.error.length
+				}}
+			/>
+
+			<div className="container">
+				<Sidebar data={sidebarData} />
+
+				<Map />
+			</div>
 		</div>
 	);
 }
