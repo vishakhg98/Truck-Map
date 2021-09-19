@@ -51,7 +51,7 @@ export default function Header(props) {
 			})}
 
 			<div className="headerSelectBoxContainer">
-				<SelectBox />
+				<SelectBox data={props.activeData} />
 			</div>
 		</div>
 	);

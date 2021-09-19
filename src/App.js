@@ -141,6 +141,7 @@ function App() {
 					idle: dataStore.idle.length,
 					error: dataStore.error.length
 				}}
+				activeData={dataStore[selectedMode]}
 			/>
 
 			<div className="container">
