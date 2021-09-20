@@ -14,6 +14,7 @@ export default function SelectBox(props) {
 		}
 		// To update selected Mode to sidebar and map
 		props.updateSelectedData(selectedData);
+		// eslint-disable-next-line
 	}, [selectedData]);
 
 	useEffect(() => {

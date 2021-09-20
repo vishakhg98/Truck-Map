@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './Css/Header.css';
 import { TRUCK_KEYS } from '../utils/Constants';
 import SelectBox from '../SelectBox/SelectBox';
