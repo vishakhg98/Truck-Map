@@ -70,7 +70,6 @@ export default function Map(props) {
 				await initMap();
 			};
 			document.body.appendChild(script);
-			console.log('MAP LOADED');
 		} catch (err) {
 			console.error(err);
 		}
@@ -88,8 +87,6 @@ export default function Map(props) {
 			mapTypeId: 'hybrid',
 			disableDefaultUI: false
 		});
-
-		console.log('MAP INITIALIZED');
 
 		// Fetching API data
 		if (props.onLoadAction) await props.onLoadAction();

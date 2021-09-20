@@ -17,7 +17,6 @@ function App() {
 	const [selectedMode, setSelectedMode] = useState(TRUCK_KEYS.total);
 
 	async function getApiData() {
-		console.log('HITTING API');
 		// Hitting API
 		try {
 			const headers = {
@@ -30,7 +29,6 @@ function App() {
 
 			if (response.ok) {
 				const responseJson = await response.json();
-				console.log(responseJson);
 
 				let totalTemp = [];
 				let runningTemp = [];
