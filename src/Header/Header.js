@@ -17,14 +17,14 @@ export default function Header(props) {
 					props.updateSelectedMode(option.key);
 				}}
 			>
-				<span>{option.label}</span>
-				<span>{option.value}</span>
+				<span className="headTitle">{option.label}</span>
+				<span className="headValue">{option.value}</span>
 			</div>
 		);
 	}
 
 	return (
-		<div className="headerBase">
+		<header className="headerBase">
 			{renderHeaderOptions({
 				label: 'Total Trucks',
 				value: props.counts.total,
@@ -59,6 +59,6 @@ export default function Header(props) {
 					selectedMode={props.selectedMode}
 				/>
 			</div>
-		</div>
+		</header>
 	);
 }

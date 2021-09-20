@@ -187,7 +187,6 @@ function App() {
 					idle: selectedData.idle.length,
 					error: selectedData.error.length
 				}}
-				// SelectBox
 				totalDataStore={dataStore[selectedMode]}
 				activeData={selectedData[selectedMode]}
 				updateSelectedData={value => updateSelectedData(value)}

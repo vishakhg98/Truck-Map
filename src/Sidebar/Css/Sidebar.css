@@ -15,10 +15,14 @@
 .sidebarRows::-webkit-scrollbar-track {
 	box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
 }
-
 .sidebarRows::-webkit-scrollbar-thumb {
 	background-color: var(--input-light);
 	border-radius: 30px;
+}
+
+.sidebarSearchContainer {
+	padding: 0 var(--sidebar-padding);
+	border-bottom: 2px solid var(--select-border);
 }
 
 .sidebarRow,

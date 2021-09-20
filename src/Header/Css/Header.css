@@ -19,10 +19,25 @@
 	cursor: pointer;
 }
 
+.headerOption:hover {
+	background: var(--selected-hover);
+}
+
 .headerOption-selected {
 	background: var(--selected-background);
 }
 
 .headerSelectBoxContainer {
 	cursor: context-menu;
+}
+
+.headTitle {
+	color: var(--input-dark);
+	font-weight: 600;
+}
+
+.headValue {
+	color: var(--input-darker);
+	font-weight: 700;
+	font-size: 20px;
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Search from '../Search/Search';
 import './Css/SelectBox.css';
+import Search from '../Search/Search';
 
 export default function SelectBox(props) {
 	const [selectedData, setSelectedData] = useState([]);
@@ -47,14 +47,13 @@ export default function SelectBox(props) {
 		);
 	}
 	if (selectedData.length) {
-		filteredData = filteredData.filter(el => !selectedData.includes(el));
+		filteredData = filteredData.filter(i => !selectedData.includes(i));
 	}
 
 	return (
 		<div className="selectBoxBase" tabIndex="0">
 			<div className="selectBox-head">
-				Select <span className="selectBox-arrow">⮟</span>
-				<span>{selectedData.length ? selectedData.length : ''}</span>
+				Select <span className="selectBox-arrow">🢒</span>
 			</div>
 			<div className="selectBoxContentContainer">
 				<ul className="selectBox-selectedContainer">
@@ -68,7 +67,16 @@ export default function SelectBox(props) {
 						</li>
 					))}
 				</ul>
-				<Search updateSearch={value => setSearchValue(value)} />
+
+				<div className="selectBox-searchContainer">
+					<Search
+						updateSearch={value => setSearchValue(value)}
+						fontSize={14}
+						placeholder="Search..."
+						border={`2px solid var(--input-light)`}
+					/>
+				</div>
+
 				<ul className="selectBox-unselectedContainer">
 					{filteredData.map((truck, index) => (
 						<li

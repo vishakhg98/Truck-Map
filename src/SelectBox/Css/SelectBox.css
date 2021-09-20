@@ -1,26 +1,44 @@
 .selectBoxBase {
 	position: relative;
+	border-radius: 5px;
+}
+
+.selectBox-head {
+	padding: 10px 60px;
+	cursor: pointer;
+	border: 1px solid var(--select-border);
+	border-radius: 3px;
+	white-space: nowrap;
+}
+
+.selectBox-arrow {
+	display: inline-block;
+	transform: rotate(90deg);
+	font-size: 18px;
+	height: 19px;
+	line-height: 16px;
 }
 
 .selectBoxContentContainer {
 	position: absolute;
 	background-color: red;
 	left: 0;
-	top: calc(100% + 5px);
+	top: 10%;
 	background-color: white;
-	padding: 10px;
-	padding-right: 7px;
-	border-radius: 0.25rem;
-	box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1);
-	transform: translateY(-10px);
-	transition: opacity 250ms ease-in-out, transform 250ms ease-in-out;
+	padding: 10px 0;
+	box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.2);
 	width: 100%;
 	text-align: left;
-	overflow-y: auto;
 	height: 85vh;
+	overflow-y: auto;
+	transform: translateY(-10px);
+	transition: opacity 250ms ease-in-out, transform 250ms ease-in-out;
 	z-index: 3;
 	opacity: 0;
 	pointer-events: none;
+	border-top: 1px solid var(--select-border);
+	border-bottom: 1px solid var(--select-border);
+	border-radius: 3px;
 }
 .selectBoxContentContainer::-webkit-scrollbar {
 	width: 6px;
@@ -40,29 +58,31 @@
 	pointer-events: auto;
 }
 
-.selectBox-head {
-	padding: 10px 60px;
-	cursor: pointer;
-	box-shadow: 0 0 8px 4px hsl(0deg 0% 78% / 21%);
-	border: 1px solid var(--select-border);
-}
-.selectBoxBase:focus-within > .selectBox-head {
-	color: black;
-	/* font-weight: 600; */
-}
-
 .selectBox-selectedContainer {
 	border-bottom: 2px solid var(--select-border);
 	padding: 0 0 10px;
 }
-
-.selectBox-selectedItem {
-	background-color: cornflowerblue;
-	color: #fff;
-	cursor: pointer;
-}
 .selectBox-unselectedContainer {
+	border-top: 2px solid var(--select-border);
+	padding: 10px 0 0px;
 }
+.selectBox-selectedItem,
 .selectBox-unselectedItem {
 	cursor: pointer;
+	padding: 5px 10px;
+	font-weight: 600;
+	color: #363636;
+}
+
+.selectBox-selectedItem {
+	background-color: #3971a9;
+	color: #fff;
+}
+
+.selectBox-unselectedItem:hover {
+	background: var(--selected-hover);
+}
+
+.selectBox-searchContainer {
+	padding: 10px;
 }

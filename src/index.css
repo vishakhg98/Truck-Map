@@ -19,7 +19,7 @@ code {
 		monospace;
 }
 
-/* Custome variables */
+/* Custom variables */
 :root {
 	--header-height: 80px;
 	--sidebar-width: 250px;
@@ -31,4 +31,5 @@ code {
 	--input-darker: #2c2d2e;
 	--select-border: #cccccc;
 	--selected-background: #e9ebeb;
+	--selected-hover: #f4f4f4;
 }

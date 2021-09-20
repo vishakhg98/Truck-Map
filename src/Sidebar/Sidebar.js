@@ -35,7 +35,11 @@ export default function Sidebar(props) {
 	return (
 		<div className="sidebarBase">
 			<div className="sidebarSearchContainer">
-				<Search updateSearch={string => setSearchValue(string)} />
+				<Search
+					updateSearch={string => setSearchValue(string)}
+					fontSize={18}
+					placeholder="Search Trucks"
+				/>
 			</div>
 
 			<div className="sidebarRows">
@@ -65,7 +69,6 @@ export default function Sidebar(props) {
 									<div className="sidebar-truckRight">
 										<small className="sidebar-lastTruckUpdateTime">
 											{getTimeDifference(truck.createTime)}
-											{/* 2 min */}
 										</small>
 										<p className="sidebar-truckSpeed">
 											{truck.status === 'running' &&

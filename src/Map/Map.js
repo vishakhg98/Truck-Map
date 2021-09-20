@@ -95,10 +95,5 @@ export default function Map(props) {
 		if (props.onLoadAction) await props.onLoadAction();
 	}
 
-	return (
-		<div
-			id="map"
-			// style={{ background: mapLoader && 'pink' }}
-		/>
-	);
+	return <div id="map" />;
 }
