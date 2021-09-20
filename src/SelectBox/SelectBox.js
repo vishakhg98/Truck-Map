@@ -73,7 +73,7 @@ export default function SelectBox(props) {
 						updateSearch={value => setSearchValue(value)}
 						fontSize={14}
 						placeholder="Search..."
-						border={`2px solid var(--input-light)`}
+						border={`2px solid var(--select-border)`}
 					/>
 				</div>
 
