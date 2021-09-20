@@ -1,10 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Search from '../Search/Search';
 import './Css/SelectBox.css';
 
 export default function SelectBox(props) {
 	const [selectedData, setSelectedData] = useState([]);
 	const [searchValue, setSearchValue] = useState('');
+
+	let initialRender = useRef(true);
+
+	useEffect(() => {
+		if (initialRender.current) {
+			return;
+		}
+		// To update selected Mode to sidebar and map
+		props.updateSelectedData(selectedData);
+	}, [selectedData]);
+
+	useEffect(() => {
+		if (initialRender.current) {
+			initialRender.current = false;
+			return;
+		}
+		// To reset selected list on selected mode change
+		setSelectedData([]);
+	}, [props.selectedMode]);
 
 	function addToSelected(data) {
 		let tempData = [...selectedData];
@@ -20,9 +39,9 @@ export default function SelectBox(props) {
 		setSelectedData(tempData);
 	}
 
-	let filteredData = props.data;
+	let filteredData = props.totalDataStore ? props.totalDataStore : [];
 	if (searchValue) {
-		filteredData = props.data.filter(i =>
+		filteredData = filteredData.filter(i =>
 			i.truckNumber.toLowerCase().includes(searchValue.toLowerCase())
 		);
 	}
@@ -38,8 +57,9 @@ export default function SelectBox(props) {
 			</div>
 			<div className="selectBoxContentContainer">
 				<ul className="selectBox-selectedContainer">
-					{selectedData.map(truck => (
+					{selectedData.map((truck, index) => (
 						<li
+							key={index}
 							className="selectBox-selectedItem"
 							onClick={() => removeFromSelected(truck)}
 						>
@@ -49,8 +69,9 @@ export default function SelectBox(props) {
 				</ul>
 				<Search updateSearch={value => setSearchValue(value)} />
 				<ul className="selectBox-unselectedContainer">
-					{filteredData.map(truck => (
+					{filteredData.map((truck, index) => (
 						<li
+							key={index}
 							className="selectBox-unselectedItem"
 							onClick={() => addToSelected(truck)}
 						>

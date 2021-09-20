@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Css/Header.css';
 import { TRUCK_KEYS } from '../utils/Constants';
 import SelectBox from '../SelectBox/SelectBox';
@@ -13,6 +13,7 @@ export default function Header(props) {
 						: 'headerOption'
 				}
 				onClick={() => {
+					if (option.key === props.selectedMode) return;
 					props.updateSelectedMode(option.key);
 				}}
 			>
@@ -51,7 +52,12 @@ export default function Header(props) {
 			})}
 
 			<div className="headerSelectBoxContainer">
-				<SelectBox data={props.activeData} />
+				<SelectBox
+					totalDataStore={props.totalDataStore}
+					data={props.activeData}
+					updateSelectedData={value => props.updateSelectedData(value)}
+					selectedMode={props.selectedMode}
+				/>
 			</div>
 		</div>
 	);
