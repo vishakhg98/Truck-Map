@@ -2,6 +2,7 @@
 
 https://truck-map.vercel.app/
 
+Live truck status of India (running,stopped, idle, and broken down trucks).
 Web App built using react and google maps api to detect trucks data provided by https://web.mystral.in/ api.
 
 ## Screenshot
